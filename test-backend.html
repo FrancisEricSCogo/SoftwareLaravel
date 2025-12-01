@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Test - Cogo Software</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Backend Test Page</h1>
+        <p>This page tests the Laravel backend API endpoints.</p>
+
+        <div class="test-section info">
+            <h3>Backend Configuration</h3>
+            <p><strong>Base URL:</strong> <span id="baseUrl">Loading...</span></p>
+            <p><strong>Status:</strong> <span id="connectionStatus">Checking...</span></p>
+        </div>
+
+        <div class="test-section">
+            <h3>Test Backend Connection</h3>
+            <button onclick="testConnection()">Test Connection</button>
+            <div id="connectionResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>User Registration Test</h3>
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" id="regName" placeholder="John Doe">
+            </div>
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="regUsername" placeholder="johndoe">
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="regEmail" placeholder="john@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="regPassword" placeholder="password123">
+            </div>
+            <div class="form-group">
+                <label>Contact Number:</label>
+                <input type="text" id="regContact" placeholder="+1234567890">
+            </div>
+            <button onclick="testRegister()">Test Registration</button>
+            <div id="registerResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>User Login Test</h3>
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="loginUsername" placeholder="johndoe">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="loginPassword" placeholder="password123">
+            </div>
+            <button onclick="testLogin()">Test Login</button>
+            <div id="loginResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Software CRUD Test</h3>
+            <div class="form-group">
+                <label>Vendor:</label>
+                <input type="text" id="softwareVendor" placeholder="Microsoft">
+            </div>
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" id="softwareName" placeholder="Office 365">
+            </div>
+            <div class="form-group">
+                <label>Plan Type:</label>
+                <input type="text" id="softwarePlan" placeholder="Business">
+            </div>
+            <button onclick="testCreateSoftware()">Create Software</button>
+            <button onclick="testListSoftware()">List Software</button>
+            <div id="softwareResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>API Response Log</h3>
+            <pre id="apiLog">No API calls yet...</pre>
+        </div>
+    </div>
+
+    <!-- Include Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <script>
+        // Set up Axios
+        const API_BASE = 'http://127.0.0.1:8000/api/';
+        axios.defaults.baseURL = API_BASE;
+        axios.defaults.timeout = 10000;
+
+        // Update UI
+        document.getElementById('baseUrl').textContent = API_BASE;
+
+        // Log API calls
+        function logApiCall(method, url, data, response, error) {
+            const log = document.getElementById('apiLog');
+            const timestamp = new Date().toLocaleTimeString();
+            let logEntry = `[${timestamp}] ${method.toUpperCase()} ${url}\n`;
+            
+            if (data) {
+                logEntry += `Request: ${JSON.stringify(data, null, 2)}\n`;
+            }
+            
+            if (response) {
+                logEntry += `Response: ${JSON.stringify(response, null, 2)}\n`;
+            }
+            
+            if (error) {
+                logEntry += `Error: ${JSON.stringify(error, null, 2)}\n`;
+            }
+            
+            logEntry += '\n' + '='.repeat(50) + '\n';
+            log.textContent = logEntry + log.textContent;
+        }
+
+        // Test connection
+        async function testConnection() {
+            const resultDiv = document.getElementById('connectionResult');
+            const statusDiv = document.getElementById('connectionStatus');
+            
+            try {
+                const response = await axios.get('/test');
+                resultDiv.innerHTML = '<div class="success">✅ Connection successful!</div>';
+                statusDiv.textContent = 'Connected';
+                logApiCall('GET', '/test', null, response.data);
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Connection failed: ' + error.message + '</div>';
+                statusDiv.textContent = 'Failed';
+                logApiCall('GET', '/test', null, null, error.response?.data || error.message);
+            }
+        }
+
+        // Test registration
+        async function testRegister() {
+            const resultDiv = document.getElementById('registerResult');
+            const data = {
+                name: document.getElementById('regName').value,
+                username: document.getElementById('regUsername').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                contact_number: document.getElementById('regContact').value
+            };
+
+            try {
+                const response = await axios.post('/auth/register', data);
+                resultDiv.innerHTML = '<div class="success">✅ Registration successful!</div>';
+                logApiCall('POST', '/auth/register', data, response.data);
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Registration failed: ' + (error.response?.data?.message || error.message) + '</div>';
+                logApiCall('POST', '/auth/register', data, null, error.response?.data || error.message);
+            }
+        }
+
+        // Test login
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            const data = {
+                username: document.getElementById('loginUsername').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            try {
+                const response = await axios.post('/auth/login', data);
+                resultDiv.innerHTML = '<div class="success">✅ Login successful!</div>';
+                logApiCall('POST', '/auth/login', data, response.data);
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Login failed: ' + (error.response?.data?.message || error.message) + '</div>';
+                logApiCall('POST', '/auth/login', data, null, error.response?.data || error.message);
+            }
+        }
+
+        // Test create software
+        async function testCreateSoftware() {
+            const resultDiv = document.getElementById('softwareResult');
+            const data = {
+                vendor: document.getElementById('softwareVendor').value,
+                name: document.getElementById('softwareName').value,
+                plan_type: document.getElementById('softwarePlan').value
+            };
+
+            try {
+                const response = await axios.post('/software', data);
+                resultDiv.innerHTML = '<div class="success">✅ Software created successfully!</div>';
+                logApiCall('POST', '/software', data, response.data);
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Software creation failed: ' + (error.response?.data?.message || error.message) + '</div>';
+                logApiCall('POST', '/software', data, null, error.response?.data || error.message);
+            }
+        }
+
+        // Test list software
+        async function testListSoftware() {
+            const resultDiv = document.getElementById('softwareResult');
+            
+            try {
+                const response = await axios.get('/software');
+                resultDiv.innerHTML = '<div class="success">✅ Software list retrieved successfully!</div><pre>' + JSON.stringify(response.data, null, 2) + '</pre>';
+                logApiCall('GET', '/software', null, response.data);
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Software list failed: ' + (error.response?.data?.message || error.message) + '</div>';
+                logApiCall('GET', '/software', null, null, error.response?.data || error.message);
+            }
+        }
+
+        // Auto-test connection on load
+        window.addEventListener('load', testConnection);
+    </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoftManage - Simple Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f8fafc;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status { 
+            background: #e8f5e8; 
+            color: #2e7d32; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 20px 0;
+        }
+        .btn { 
+            background: #6366f1; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover { background: #5b5bd6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 SoftManage - Simple Test Page</h1>
+        
+        <div class="status">
+            ✅ This page should NOT refresh automatically
+        </div>
+        
+        <p>If this page is refreshing, there's a JavaScript issue. This version has minimal JavaScript.</p>
+        
+        <h2>Test Links:</h2>
+        <a href="login.html" class="btn">Login Page</a>
+        <a href="software.html" class="btn">Software Page</a>
+        <a href="debug.html" class="btn">Debug Page</a>
+        
+        <h2>Backend Status:</h2>
+        <div id="backend-status">Checking...</div>
+        
+        <h2>Console Log:</h2>
+        <div id="console-log" style="background: #f0f0f0; padding: 10px; border-radius: 5px; font-family: monospace; white-space: pre-wrap;"></div>
+    </div>
+
+    <script>
+        // Simple backend test without auto-detection
+        console.log('Simple test page loaded at:', new Date().toLocaleString());
+        
+        async function testBackend() {
+            const statusEl = document.getElementById('backend-status');
+            const logEl = document.getElementById('console-log');
+            
+            try {
+                logEl.textContent += 'Testing backend connection...\n';
+                const response = await fetch('http://127.0.0.1:8000/api/test');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusEl.innerHTML = '✅ Backend Connected: ' + data.message;
+                    statusEl.style.background = '#e8f5e8';
+                    statusEl.style.color = '#2e7d32';
+                    logEl.textContent += 'Backend test successful!\n';
+                } else {
+                    statusEl.innerHTML = '❌ Backend Error: ' + response.status;
+                    statusEl.style.background = '#ffebee';
+                    statusEl.style.color = '#c62828';
+                    logEl.textContent += 'Backend returned error: ' + response.status + '\n';
+                }
+            } catch (error) {
+                statusEl.innerHTML = '❌ Backend Not Accessible: ' + error.message;
+                statusEl.style.background = '#ffebee';
+                statusEl.style.color = '#c62828';
+                logEl.textContent += 'Backend connection failed: ' + error.message + '\n';
+            }
+        }
+        
+        // Test backend after 1 second
+        setTimeout(testBackend, 1000);
+        
+        // Log any errors
+        window.addEventListener('error', function(e) {
+            document.getElementById('console-log').textContent += 'ERROR: ' + e.message + '\n';
+        });
+    </script>
+</body>
+</html>

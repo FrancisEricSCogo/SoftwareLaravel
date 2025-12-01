@@ -1,0 +1,16 @@
+body { font-family: system-ui, Arial, sans-serif; margin: 0; }
+nav { display: flex; gap: 12px; padding: 10px 16px; background: #111; color: #fff; align-items: center; }
+nav a { color: #fff; text-decoration: none; }
+nav .right { margin-left: auto; }
+main { padding: 16px; }
+form { display: grid; gap: 8px; margin: 12px 0; max-width: 460px; }
+label { display: grid; gap: 4px; }
+input, button { padding: 8px; font-size: 14px; }
+button { cursor: pointer; }
+#tbl { border-collapse: collapse; width: 100%; max-width: 800px; }
+#tbl th, #tbl td { border: 1px solid #ddd; padding: 8px; }
+#tbl tr:nth-child(even){ background: #f6f6f6; }
+.profile { display: flex; gap: 16px; align-items: flex-start; }
+pre { background: #f7f7f7; padding: 8px; }
+/* keep nav compact when items are hidden */
+nav a, nav button { display: inline-block; }

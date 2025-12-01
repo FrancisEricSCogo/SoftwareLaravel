@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verify Email - SoftManage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #334155;
+      line-height: 1.6;
+    }
+
+    /* Modern Split Layout */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+    }
+
+    /* Left Side - Hero Section */
+    .hero-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.4;
+    }
+
+    .hero-content {
+      text-align: center;
+      z-index: 2;
+      max-width: 400px;
+    }
+
+    .hero-logo {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      color: #ffffff;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-logo::before {
+      content: "⚡";
+      margin-right: 0.5rem;
+      color: #fbbf24;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      font-size: 0.9em;
+      display: inline-block;
+    }
+
+    .hero-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      color: #ffffff;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-description {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+      color: #f1f5f9;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-features {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1rem;
+      color: #f8fafc;
+      font-weight: 500;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .feature-icon {
+      width: 24px;
+      height: 24px;
+      background: #10b981;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Right Side - Form Section */
+    .form-section {
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      border-left: 1px solid #e2e8f0;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 3rem 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      background: rgba(248, 250, 252, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-brand {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #4f46e5;
+    }
+
+    .nav-brand::before {
+      content: "⚡";
+      margin-right: 0.5rem;
+      color: #fbbf24;
+      font-size: 1em;
+      display: inline-block;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .nav-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: #64748b;
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      color: #4f46e5;
+      background: rgba(79, 70, 229, 0.1);
+    }
+
+    .btn-primary {
+      background: #4f46e5;
+      color: white !important;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: #4338ca;
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569 !important;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    /* Form Content */
+    .form-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 3rem;
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+      overflow-y: auto;
+    }
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .email-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+    }
+
+    .email-icon::before {
+      content: "📧";
+      font-size: 1.75rem;
+    }
+
+    .form-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-subtitle {
+      font-size: 1rem;
+      color: #64748b;
+      margin-bottom: 1rem;
+    }
+
+    .email-display {
+      font-size: 1rem;
+      color: #4f46e5;
+      font-weight: 600;
+      background: rgba(79, 70, 229, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      margin: 0 auto;
+      display: inline-block;
+    }
+
+    /* Modern Form Design */
+    .verify-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .otp-input {
+      padding: 1.25rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1.25rem;
+      font-family: 'Inter', monospace;
+      background: #ffffff;
+      color: #1e293b;
+      transition: all 0.3s ease;
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.25rem;
+      font-weight: 600;
+    }
+
+    .otp-input:focus {
+      border-color: #4f46e5;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .otp-input::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+      letter-spacing: 0.1rem;
+    }
+
+    .input-hint {
+      font-size: 0.8rem;
+      color: #64748b;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    .verify-btn {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      border: none;
+      padding: 1.25rem 2rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+    }
+
+    .verify-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(79, 70, 229, 0.4);
+    }
+
+    .verify-btn:active {
+      transform: translateY(0);
+    }
+
+    .verify-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .resend-section {
+      text-align: center;
+      padding: 1rem 0;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 1rem;
+    }
+
+    .resend-btn {
+      background: none;
+      border: none;
+      color: #4f46e5;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .resend-btn:hover {
+      background: rgba(79, 70, 229, 0.1);
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+      color: #64748b;
+    }
+
+    .login-link a {
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-section {
+        min-height: 40vh;
+        padding: 2rem;
+      }
+
+      .hero-title {
+        font-size: 1.25rem;
+      }
+
+      .hero-logo {
+        font-size: 2.5rem;
+      }
+
+      .form-content {
+        padding: 2rem;
+      }
+
+      .top-nav {
+        padding: 1.5rem 2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-section {
+        min-height: 35vh;
+        padding: 1.5rem;
+      }
+
+      .hero-title {
+        font-size: 1.1rem;
+      }
+
+      .hero-description {
+        font-size: 1rem;
+      }
+
+      .form-content {
+        padding: 1rem 1.5rem 2rem;
+      }
+
+      .form-title {
+        font-size: 1.8rem;
+      }
+
+      .top-nav {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-features {
+        align-items: center;
+        text-align: center;
+      }
+
+      .feature-item {
+        justify-content: center;
+      }
+
+      .form-content {
+        padding: 1rem;
+      }
+
+      .form-title {
+        font-size: 1.6rem;
+      }
+
+      .nav-group {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+    }
+
+    /* Animations */
+    .hero-content > * {
+      animation: slideInLeft 0.8s ease forwards;
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+
+    .hero-logo { animation-delay: 0.1s; }
+    .hero-title { animation-delay: 0.2s; }
+    .hero-description { animation-delay: 0.3s; }
+    .hero-features { animation-delay: 0.4s; }
+
+    .form-header, .verify-form > * {
+      animation: slideInRight 0.8s ease forwards;
+      opacity: 0;
+      transform: translateX(30px);
+    }
+
+    .form-header { animation-delay: 0.1s; }
+    .verify-form > *:nth-child(1) { animation-delay: 0.2s; }
+    .verify-form > *:nth-child(2) { animation-delay: 0.3s; }
+    .verify-form > *:nth-child(3) { animation-delay: 0.4s; }
+    .resend-section { animation-delay: 0.5s; }
+    .login-link { animation-delay: 0.6s; }
+
+    @keyframes slideInLeft {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInRight {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Loading state */
+    .verify-btn.loading::after {
+      content: "";
+      width: 16px;
+      height: 16px;
+      margin-left: 8px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+    }
+
+    .loading {
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Left Hero Section -->
+    <div class="hero-section">
+      <div class="hero-content">
+        <h1 class="hero-logo">SoftManage</h1>
+        <h1 class="hero-title">Almost There!</h1>
+        <p class="hero-description">Just one more step to complete your account setup and start managing your software assets.</p>
+        
+        <div class="hero-features">
+          <div class="feature-item">
+            <div class="feature-icon">📧</div>
+            <span>Check your email inbox</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🔐</div>
+            <span>Enter the 6-digit verification code</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">✅</div>
+            <span>Complete your account verification</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🚀</div>
+            <span>Start using SoftManage</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Form Section -->
+    <div class="form-section">
+      <nav class="top-nav">
+        <div class="nav-brand">SoftManage</div>
+        
+        <div class="nav-links">
+          <div class="guest-only nav-group">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="register.html" class="nav-link">Register</a>
+            <a href="login.html" class="nav-link btn-primary">Login</a>
+          </div>
+
+          <div class="auth-only nav-group">
+            <a href="software.html" class="nav-link">Software</a>
+            <a href="profile.html" class="nav-link">Profile</a>
+            <button class="nav-link btn-secondary" id="btnLogout">Logout</button>
+          </div>
+        </div>
+      </nav>
+
+      <div class="form-content">
+        <div class="form-header">
+          <div class="email-icon"></div>
+          <h1 class="form-title">Verify Your Email</h1>
+          <p class="form-subtitle">Enter the verification code sent to</p>
+          <div class="email-display" id="emailMessage">your email address</div>
+        </div>
+        
+        <form id="verifyForm" class="verify-form">
+          <div class="form-group">
+            <label class="form-label">6-Digit Verification Code</label>
+            <input type="text" id="otpCode" name="otp_code" class="otp-input" 
+                   placeholder="000000" maxlength="6" pattern="[0-9]*" inputmode="numeric" required>
+            <div class="input-hint">Please check your email for the verification code</div>
+          </div>
+          
+          <button type="submit" class="verify-btn" id="verifyBtn">
+            <span class="loading" id="verifyLoading">
+              <i class="fas fa-spinner fa-spin mr-2"></i>
+            </span>
+            Verify Email Address
+          </button>
+        </form>
+        
+        <div class="resend-section">
+          <button id="resendBtn" class="resend-btn">
+            Didn't receive the code? Resend verification email
+          </button>
+        </div>
+        
+        <div class="login-link">
+          Already verified? 
+          <a href="login.html">Sign in to your account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple auth state management for demo
+    let isAuthenticated = false;
+
+    function toggleAuthState() {
+      isAuthenticated = !isAuthenticated;
+      updateUI();
+    }
+
+    function updateUI() {
+      const guestElements = document.querySelectorAll('.guest-only');
+      const authElements = document.querySelectorAll('.auth-only');
+      
+      guestElements.forEach(el => {
+        el.style.display = isAuthenticated ? 'none' : 'block';
+      });
+      
+      authElements.forEach(el => {
+        el.style.display = isAuthenticated ? 'block' : 'none';
+      });
+    }
+
+    // OTP input formatting
+    function formatOTPInput(input) {
+      input.value = input.value.replace(/[^0-9]/g, '').substring(0, 6);
+    }
+
+    // Show alert function (matching your existing style)
+    function showAlert(title, message, type) {
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          title: title,
+          text: message,
+          icon: type,
+          confirmButtonColor: '#4f46e5'
+        });
+      } else {
+        alert(`${title}: ${message}`);
+      }
+    }
+
+    // Handle logout button
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutBtn = document.getElementById('btnLogout');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+          isAuthenticated = false;
+          updateUI();
+        });
+      }
+
+      // Get email from URL parameter or sessionStorage
+      const urlParams = new URLSearchParams(window.location.search);
+      let email = urlParams.get('email');
+
+      // If no email in URL, try sessionStorage (from login redirect)
+      if (!email) {
+        email = sessionStorage.getItem('unverifiedEmail');
+      }
+
+      if (email) {
+        document.getElementById('emailMessage').textContent = email;
+      } else {
+        // No email found, redirect to login
+        showAlert('Error', 'Email not found. Please login again.', 'error');
+        setTimeout(() => window.location.href = 'login.html', 2000);
+      }
+
+      // OTP input handling
+      const otpInput = document.getElementById('otpCode');
+      otpInput.addEventListener('input', function(e) {
+        formatOTPInput(e.target);
+      });
+
+      // Form submission
+      const form = document.getElementById('verifyForm');
+      const verifyBtn = document.getElementById('verifyBtn');
+      const loadingSpinner = document.getElementById('verifyLoading');
+      
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const otpCode = document.getElementById('otpCode').value;
+        
+        if (otpCode.length !== 6) {
+          showAlert('Invalid Code', 'Please enter a valid 6-digit verification code.', 'error');
+          return;
+        }
+
+        // Add loading state
+        verifyBtn.classList.add('loading');
+        verifyBtn.textContent = 'Verifying...';
+        verifyBtn.disabled = true;
+        loadingSpinner.style.display = 'inline';
+        
+        try {
+          // Simulate API call - replace with your actual API endpoint
+          const response = await api('/auth/verify-email', {
+            method: 'POST',
+            data: {
+              email: email,
+              otp_code: otpCode
+            }
+          });
+          
+          showAlert('Email Verified', 'Your email has been verified successfully. You can now login.', 'success');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 2000);
+          
+        } catch (error) {
+          let errorMessage = 'Invalid verification code. Please try again.';
+          if (error.errors && error.errors.length > 0) {
+            errorMessage = error.errors[0].msg || errorMessage;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          showAlert('Verification Failed', errorMessage, 'error');
+        } finally {
+          // Remove loading state
+          verifyBtn.classList.remove('loading');
+          verifyBtn.textContent = 'Verify Email Address';
+          verifyBtn.disabled = false;
+          loadingSpinner.style.display = 'none';
+        }
+      });
+
+      // Handle resend OTP
+      const resendBtn = document.getElementById('resendBtn');
+      resendBtn.addEventListener('click', async function() {
+        if (!email) {
+          showAlert('Error', 'Email not found. Please register again.', 'error');
+          return;
+        }
+        
+        resendBtn.disabled = true;
+        resendBtn.textContent = 'Sending...';
+        
+        try {
+          const response = await api('/auth/resend-otp', {
+            method: 'POST',
+            data: { email: email }
+          });
+          
+          showAlert('Code Sent', 'A new verification code has been sent to your email.', 'success');
+          
+          // Start countdown
+          let countdown = 60;
+          const countdownInterval = setInterval(() => {
+            resendBtn.textContent = `Resend in ${countdown}s`;
+            countdown--;
+            
+            if (countdown < 0) {
+              clearInterval(countdownInterval);
+              resendBtn.disabled = false;
+              resendBtn.textContent = 'Didn\'t receive the code? Resend verification email';
+            }
+          }, 1000);
+          
+        } catch (error) {
+          let errorMessage = 'Failed to resend verification code.';
+          if (error.errors && error.errors.length > 0) {
+            errorMessage = error.errors[0].msg || errorMessage;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          showAlert('Error', errorMessage, 'error');
+          
+          resendBtn.disabled = false;
+          resendBtn.textContent = 'Didn\'t receive the code? Resend verification email';
+        }
+      });
+    });
+
+    // Initialize UI
+    updateUI();
+  </script>
+  
+  <!-- Include Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="app-axios.js"></script>
+</body>
+</html>

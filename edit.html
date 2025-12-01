@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Software - SoftManage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    // Define base URL early to prevent errors in image onerror handlers
+    if (!window.BASE) {
+      window.BASE = localStorage.getItem('BACKEND_BASE') || 'http://localhost:8080/';
+    }
+    function getBase() {
+      return window.BASE;
+    }
+    window.getBase = getBase;
+  </script>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      color: #334155;
+      line-height: 1.6;
+    }
+
+    /* Background decoration */
+    .bg-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(79,70,229,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Navigation */
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem 2rem;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #4f46e5;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo::before {
+      content: "⚡";
+      margin-right: 0.5rem;
+      color: #fbbf24;
+      font-size: 1em;
+      display: inline-block;
+    }
+
+    .logo:hover {
+      color: #3730a3;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-links a, .nav-links button {
+      text-decoration: none;
+      color: #64748b;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      border: none;
+      background: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover, .nav-links button:hover {
+      color: #4f46e5;
+      background: rgba(79, 70, 229, 0.1);
+    }
+
+    .nav-links .guest-only a:last-child {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+
+    .nav-links .guest-only a:last-child:hover {
+      background: #e2e8f0;
+    }
+
+    /* Main Content */
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+      background: rgba(79, 70, 229, 0.1);
+      transform: translateX(-2px);
+    }
+
+    .back-link::before {
+      content: "←";
+      margin-right: 0.5rem;
+      font-size: 1.2em;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    main > p {
+      font-size: 1.1rem;
+      color: #64748b;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    /* Edit Form Styles */
+    #editForm {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      display: grid;
+      gap: 2rem;
+      position: relative;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group label[for="vendor"]::before {
+      content: "🏢";
+      font-size: 1.1em;
+    }
+
+    .form-group label[for="name"]::before {
+      content: "💾";
+      font-size: 1.1em;
+    }
+
+    .form-group label[for="plan_type"]::before {
+      content: "📋";
+      font-size: 1.1em;
+    }
+
+    .form-group input[type="text"] {
+      padding: 1rem 1.25rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: #ffffff;
+      color: #1e293b;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .form-group input[type="text"]:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-group input[type="text"]::placeholder {
+      color: #94a3b8;
+    }
+
+    /* Image Section */
+    .image-preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+
+    .current-image-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .current-image-section p {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .image-container {
+      width: 100%;
+      max-width: 280px;
+      height: 200px;
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .file-input-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group input[type="file"] {
+      padding: 1rem 1.25rem;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: #f8fafc;
+      color: #475569;
+      transition: all 0.3s ease;
+      outline: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .form-group input[type="file"]:hover {
+      border-color: #4f46e5;
+      background: rgba(79, 70, 229, 0.05);
+    }
+
+    .form-group input[type="file"]::-webkit-file-upload-button {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-right: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .form-group input[type="file"]::-webkit-file-upload-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .file-help-text {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+
+    /* Action Buttons */
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      padding: 1rem 2.5rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-primary::before {
+      content: "💾";
+      font-size: 1.1em;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+      border: 2px solid #e2e8f0;
+    }
+
+    .btn-secondary::before {
+      content: "✕";
+      font-size: 1.1em;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    /* Smart Alert Modal Styles */
+    .smart-alert-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      padding: 1rem;
+    }
+
+    .smart-alert-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .smart-alert {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: scale(0.95) translateY(20px);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .smart-alert-overlay.active .smart-alert {
+      transform: scale(1) translateY(0);
+    }
+
+    .smart-alert-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      animation: pulse 2s infinite;
+    }
+
+    .smart-alert-icon.warning {
+      background: linear-gradient(135deg, #fee2e2 0%, #ef4444 100%);
+    }
+
+    .smart-alert-icon.success {
+      background: linear-gradient(135deg, #dcfce7 0%, #10b981 100%);
+    }
+
+    .smart-alert-icon.info {
+      background: linear-gradient(135deg, #dbeafe 0%, #3b82f6 100%);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    #smartAlertTitle {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.75rem;
+    }
+
+    #smartAlertMessage {
+      font-size: 1rem;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+    }
+
+    #smartAlertDetails {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 2rem;
+      font-style: italic;
+    }
+
+    .smart-alert-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .smart-alert-buttons button {
+      padding: 0.875rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 120px;
+    }
+
+    #smartAlertConfirm {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    #smartAlertConfirm:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    #smartAlertConfirm.danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    #smartAlertConfirm.danger:hover {
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    }
+
+    #smartAlertCancel {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+
+    #smartAlertCancel:hover {
+      background: #e2e8f0;
+      transform: translateY(-1px);
+    }
+
+    .smart-alert-buttons button:active {
+      transform: translateY(0);
+    }
+
+    /* Message Display */
+    #editMsg {
+      background: rgba(248, 250, 252, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      font-family: 'Inter', monospace;
+      font-size: 0.85rem;
+      color: #475569;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-top: 2rem;
+      display: block;
+    }
+
+    #editMsg:empty {
+      display: none;
+    }
+
+    /* Loading states */
+    .form-loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(4px);
+      border-radius: 20px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .form-loading-overlay.active {
+      display: flex;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top: 3px solid #4f46e5;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .btn-primary.loading::after {
+      content: "";
+      width: 14px;
+      height: 14px;
+      margin-left: 8px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+      }
+
+      main {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      #editForm {
+        padding: 2rem 1.5rem;
+      }
+
+      .image-preview {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .smart-alert {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+      }
+
+      .smart-alert-buttons {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      main {
+        padding: 0.5rem;
+      }
+
+      #editForm {
+        padding: 1.5rem 1rem;
+      }
+
+      .smart-alert {
+        padding: 1.5rem 1rem;
+      }
+
+      .smart-alert-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #editForm {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    /* Form validation states */
+    .form-group input.error {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+    .form-group input.success {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  
+  <!-- Smart Alert Modal -->
+  <div id="smartAlertOverlay" class="smart-alert-overlay">
+    <div class="smart-alert">
+      <div id="smartAlertIcon" class="smart-alert-icon warning">⚠️</div>
+      <h2 id="smartAlertTitle">Confirm Action</h2>
+      <p id="smartAlertMessage">Are you sure you want to proceed?</p>
+      <p id="smartAlertDetails">This action requires confirmation.</p>
+      <div class="smart-alert-buttons">
+        <button id="smartAlertCancel">Cancel</button>
+        <button id="smartAlertConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <nav class="navbar">
+      <a href="index.html" class="logo">SoftManage</a>
+      <div class="nav-links">
+        <div class="guest-only">
+          <a href="index.html">Home</a>
+          <a href="register.html">Register</a>
+          <a href="login.html">Login</a>
+        </div>
+        <div class="auth-only" style="display: none;">
+          <a href="software.html">Software</a>
+          <a href="profile.html">Profile</a>
+          <a href="#" id="btnLogout">Logout</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="form-loading-overlay" id="formLoadingOverlay">
+      <div class="loading-spinner"></div>
+    </div>
+    
+    <a href="software.html" class="back-link">Back to Software Collection</a>
+    <h1>Edit Software</h1>
+    <p>Update your software asset details with precision</p>
+
+    <form id="editForm" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="vendor">Vendor</label>
+        <input type="text" id="vendor" name="vendor" placeholder="e.g. Microsoft" required>
+      </div>
+      <div class="form-group">
+        <label for="name">Software Name</label>
+        <input type="text" id="name" name="name" placeholder="e.g. Office 365" required>
+      </div>
+      <div class="form-group">
+        <label for="plan_type">Plan Type</label>
+        <input type="text" id="plan_type" name="plan_type" placeholder="e.g. Business Premium" required>
+      </div>
+      <div class="form-group">
+        <label>🖼️ Software Image</label>
+        <div class="image-preview">
+          <div class="current-image-section">
+            <p>Current Image</p>
+            <div class="image-container">
+              <img id="preview" src="" alt="Software Image">
+            </div>
+          </div>
+          
+          <div class="file-input-section">
+            <input type="file" name="image" accept="image/*">
+            <p class="file-help-text">Choose a new image to replace the current one (optional)</p>
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <a href="software.html" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+    <pre id="editMsg"></pre>
+  </main>
+
+  <!-- Include Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="app-axios.js"></script>
+  <script>
+    // Global variables
+    let pendingCallback = null;
+    let formChanged = false;
+
+    // Smart Alert functionality
+    function showSmartAlert(options) {
+      const overlay = document.getElementById('smartAlertOverlay');
+      const icon = document.getElementById('smartAlertIcon');
+      const title = document.getElementById('smartAlertTitle');
+      const message = document.getElementById('smartAlertMessage');
+      const details = document.getElementById('smartAlertDetails');
+      const confirmBtn = document.getElementById('smartAlertConfirm');
+      const cancelBtn = document.getElementById('smartAlertCancel');
+      
+      // Set content
+      if (options.title) title.textContent = options.title;
+      if (options.message) message.textContent = options.message;
+      if (options.details) details.textContent = options.details;
+      if (options.confirmText) confirmBtn.textContent = options.confirmText;
+      if (options.cancelText) cancelBtn.textContent = options.cancelText;
+      
+      // Set icon and style
+      if (options.icon) {
+        icon.textContent = options.icon;
+        icon.className = `smart-alert-icon ${options.iconType || 'warning'}`;
+      }
+
+      // Set button styles
+      if (options.confirmClass === 'danger') {
+        confirmBtn.className = 'smart-alert-btn danger';
+      } else {
+        confirmBtn.className = 'smart-alert-btn primary';
+      }
+      
+      // Store callback
+      pendingCallback = options.onConfirm;
+      
+      // Show modal
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      // Focus on appropriate button
+      setTimeout(() => {
+        if (options.focusConfirm) {
+          confirmBtn.focus();
+        } else {
+          cancelBtn.focus();
+        }
+      }, 100);
+    }
+    
+    function hideSmartAlert() {
+      const overlay = document.getElementById('smartAlertOverlay');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      pendingCallback = null;
+    }
+
+    // Form loading overlay functions
+    function showFormLoading() {
+      const overlay = document.getElementById('formLoadingOverlay');
+      if (overlay) overlay.classList.add('active');
+    }
+
+    function hideFormLoading() {
+      const overlay = document.getElementById('formLoadingOverlay');
+      if (overlay) overlay.classList.remove('active');
+    }
+
+    // Enhanced form submission with smart alerts
+    function handleFormSubmitWithConfirmation(e) {
+      e.preventDefault();
+      
+      const form = document.getElementById('editForm');
+      const formData = new FormData(form);
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+
+      // Validate form before proceeding
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      // Get form values for confirmation
+      const vendor = formData.get('vendor') || 'Unknown Vendor';
+      const name = formData.get('name') || 'Unknown Software';
+      const planType = formData.get('plan_type') || 'Unknown Plan';
+      const hasNewImage = formData.get('image') && formData.get('image').size > 0;
+
+      const confirmationMessage = `Save changes to "${vendor} ${name}" (${planType})?`;
+      const details = hasNewImage ?
+        'This will update the software details and replace the current image.' :
+        'This will update the software details. The current image will remain unchanged.';
+
+      showSmartAlert({
+        title: 'Save Changes',
+        message: confirmationMessage,
+        details: details,
+        icon: '💾',
+        iconType: 'info',
+        confirmText: 'Save Changes',
+        confirmClass: 'primary',
+        cancelText: 'Cancel',
+        focusConfirm: true,
+        onConfirm: async function () {
+          try {
+            showFormLoading();
+
+            // Use original API call
+            await api(`/software/${id}`, { method: 'PUT', data: formData, multipart: true });
+
+            hideFormLoading();
+            formChanged = false; // Reset form changed flag
+
+            // Show success alert
+            showSmartAlert({
+              title: 'Changes Saved',
+              message: `"${vendor} ${name}" has been successfully updated!`,
+              details: 'Your software details have been saved to the system.',
+              icon: '✅',
+              iconType: 'success',
+              confirmText: 'View Software List',
+              cancelText: 'Edit More',
+              focusConfirm: true,
+              onConfirm: function () {
+                location.href = 'software.html';
+              }
+            });
+
+          } catch (err) {
+            hideFormLoading();
+            showSmartAlert({
+              title: 'Save Failed',
+              message: 'Failed to save software changes.',
+              details: 'There was an error updating the software. Please check your connection and try again.',
+              icon: '❌',
+              iconType: 'warning',
+              confirmText: 'Try Again',
+              cancelText: 'Cancel',
+              onConfirm: function () {
+                handleFormSubmitWithConfirmation(e);
+              }
+            });
+
+            const msg = document.getElementById('editMsg');
+            if (msg) msg.textContent = err?.message || JSON.stringify(err, null, 2);
+          }
+        }
+      });
+    }
+
+    // Navigation confirmation for unsaved changes
+    function setupNavigationWarning() {
+      const form = document.getElementById('editForm');
+      const inputs = form.querySelectorAll('input');
+      
+      // Track form changes
+      inputs.forEach(input => {
+        input.addEventListener('input', function() {
+          formChanged = true;
+        });
+      });
+      
+      // Override back link
+      const backLink = document.querySelector('.back-link');
+      if (backLink) {
+        backLink.addEventListener('click', function(e) {
+          if (formChanged) {
+            e.preventDefault();
+            showSmartAlert({
+              title: 'Unsaved Changes',
+              message: 'You have unsaved changes that will be lost.',
+              details: 'Are you sure you want to leave this page without saving?',
+              icon: '⚠️',
+              iconType: 'warning',
+              confirmText: 'Leave Anyway',
+              confirmClass: 'danger',
+              cancelText: 'Stay & Save',
+              onConfirm: function() {
+                location.href = 'software.html';
+              }
+            });
+          }
+        });
+      }
+      
+      // Browser navigation warning
+      window.addEventListener('beforeunload', function(e) {
+        if (formChanged) {
+          e.preventDefault();
+          e.returnValue = '';
+        }
+      });
+    }
+
+    // Image preview functionality
+    function setupImagePreview() {
+      const imageInput = document.querySelector('input[type="file"]');
+      const preview = document.getElementById('preview');
+      
+      if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          
+          if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+              showSmartAlert({
+                title: 'Invalid File Type',
+                message: 'Please select a valid image file.',
+                details: 'Only image files (PNG, JPG, GIF, etc.) are supported.',
+                icon: '🖼️',
+                iconType: 'warning',
+                confirmText: 'Choose Again',
+                cancelText: 'Cancel',
+                onConfirm: function() {
+                  imageInput.value = '';
+                }
+              });
+              return;
+            }
+            
+            // Validate file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+              showSmartAlert({
+                title: 'File Too Large',
+                message: 'The selected image is too large.',
+                details: 'Please choose an image smaller than 5MB.',
+                icon: '📏',
+                iconType: 'warning',
+                confirmText: 'Choose Another',
+                cancelText: 'Cancel',
+                onConfirm: function() {
+                  imageInput.value = '';
+                }
+              });
+              return;
+            }
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              preview.src = e.target.result;
+              formChanged = true;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+    }
+
+    // Initialize edit page - enhanced with smart alerts
+    async function initEdit() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+
+      if (!id) {
+        showSmartAlert({
+          title: 'No Software Selected',
+          message: 'No software ID was provided for editing.',
+          details: 'Please return to the software list and select a valid item to edit.',
+          icon: '❌',
+          iconType: 'warning',
+          confirmText: 'Go to Software List',
+          cancelText: 'Stay Here',
+          onConfirm: function() {
+            location.href = 'software.html';
+          }
+        });
+        return;
+      }
+
+      if (!isAuthed()) {
+        location.href = 'login.html';
+        return;
+      }
+
+      try {
+        showFormLoading();
+        const software = await api('/software/' + id);
+        
+        // Populate form fields
+        document.getElementById('vendor').value = software.data.vendor || '';
+        document.getElementById('name').value = software.data.name || '';
+        document.getElementById('plan_type').value = software.data.plan_type || '';
+
+        // Set up image preview
+        const preview = document.getElementById('preview');
+        if (preview) {
+          // Handle software image path - backend returns /uploads/... or uploads/...
+          let imagePath = software.data.image_path || '/uploads/software.png';
+          // If it doesn't start with http or /, add / prefix
+          if (!imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+            imagePath = '/' + imagePath;
+          }
+          // If it starts with uploads/, add / prefix
+          if (imagePath.startsWith('uploads/')) {
+            imagePath = '/' + imagePath;
+          }
+          
+          const imgUrl = new URL(imagePath.replace(/^\//, ''), getBase()).toString();
+          const fallbackUrl = new URL('uploads/software.png', getBase()).toString();
+          preview.src = imgUrl;
+          preview.onerror = function() {
+            this.onerror = null;
+            this.src = fallbackUrl;
+          };
+        }
+
+        hideFormLoading();
+        
+      } catch (err) {
+        hideFormLoading();
+        showSmartAlert({
+          title: 'Loading Error',
+          message: 'Failed to load software details.',
+          details: 'There was an error retrieving the software information from the server.',
+          icon: '⚠️',
+          iconType: 'warning',
+          confirmText: 'Try Again',
+          cancelText: 'Go Back',
+          onConfirm: function() {
+            location.reload();
+          }
+        });
+        
+        const msg = document.getElementById('editMsg');
+        if (msg) msg.textContent = err?.message || JSON.stringify(err, null, 2);
+      }
+    }
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Event listeners for alert buttons
+      document.getElementById('smartAlertConfirm').addEventListener('click', function() {
+        if (pendingCallback) {
+          pendingCallback();
+        }
+        hideSmartAlert();
+      });
+      
+      document.getElementById('smartAlertCancel').addEventListener('click', function() {
+        hideSmartAlert();
+      });
+      
+      // Close modal when clicking overlay
+      document.getElementById('smartAlertOverlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+          hideSmartAlert();
+        }
+      });
+      
+      // Close modal with Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('smartAlertOverlay').classList.contains('active')) {
+          hideSmartAlert();
+        }
+      });
+
+      // Setup functionality
+      setupImagePreview();
+      setupNavigationWarning();
+    });
+
+    // Initialize page with auth check
+    window.requireAuth().then(async (ok) => {
+      if (!ok) {
+        location.href = 'login.html';
+        return;
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      
+      if (!id) {
+        showSmartAlert({
+          title: 'Error',
+          message: 'No software ID provided',
+          details: 'Unable to load software details without an ID',
+          icon: '❌',
+          iconType: 'warning',
+          confirmText: 'Go Back',
+          onConfirm: () => window.location.href = 'software.html'
+        });
+        return;
+      }
+
+      try {
+        const software = await window.api('/software/' + id);
+        const form = document.getElementById('editForm');
+        
+        // Set form values
+        document.getElementById('vendor').value = software.data.vendor || '';
+        document.getElementById('name').value = software.data.name || '';
+        document.getElementById('plan_type').value = software.data.plan_type || '';
+
+        // Set image preview
+        const preview = document.getElementById('preview');
+        if (preview) {
+          // Handle software image path - backend returns /uploads/... or uploads/...
+          let imagePath = software.data.image_path || '/uploads/software.png';
+          // If it doesn't start with http or /, add / prefix
+          if (!imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+            imagePath = '/' + imagePath;
+          }
+          // If it starts with uploads/, add / prefix
+          if (imagePath.startsWith('uploads/')) {
+            imagePath = '/' + imagePath;
+          }
+          preview.src = new URL(imagePath.replace(/^\//, ''), window.getBase()).toString();
+          preview.onerror = function() {
+            this.onerror = null;
+            this.src = new URL('uploads/software.png', window.getBase()).toString();
+          };
+        }
+
+      } catch (err) {
+        showSmartAlert({
+          title: 'Error',
+          message: 'Failed to load software details',
+          details: err.message || 'An unknown error occurred',
+          icon: '❌',
+          iconType: 'warning',
+          confirmText: 'Try Again',
+          onConfirm: () => window.location.reload()
+        });
+      }
+    });
+
+    // Handle form submission
+    const editForm = document.getElementById('editForm');
+    const msgBox = document.getElementById('editMsg');
+
+    if (editForm) {
+      editForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!editForm.checkValidity()) {
+          editForm.reportValidity();
+          return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        
+        if (!id) {
+          showSmartAlert({
+            title: 'Error',
+            message: 'No software ID found',
+            details: 'Unable to save changes without a software ID',
+            icon: '❌',
+            iconType: 'warning',
+            confirmText: 'Go Back',
+            onConfirm: () => window.location.href = 'software.html'
+          });
+          return;
+        }
+
+        try {
+          showFormLoading();
+          const formData = new FormData(editForm);
+          
+          await window.api('/software/' + id, {
+            method: 'PUT',
+            data: formData,
+            multipart: true
+          });
+
+          showSmartAlert({
+            title: 'Success',
+            message: 'Software updated successfully!',
+            icon: '✅',
+            iconType: 'success',
+            confirmText: 'View List',
+            onConfirm: () => window.location.href = 'software.html'
+          });
+
+        } catch (err) {
+          showSmartAlert({
+            title: 'Error',
+            message: 'Failed to update software',
+            details: err.message || 'An unknown error occurred',
+            icon: '❌',
+            iconType: 'warning',
+            confirmText: 'Try Again',
+            cancelText: 'Cancel'
+          });
+          if (msgBox) msgBox.textContent = err.message || JSON.stringify(err);
+        } finally {
+          hideFormLoading();
+        }
+      });
+    }
+  </script>
+</body>
+</html>

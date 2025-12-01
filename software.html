@@ -1,0 +1,1439 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Software - SoftManage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      color: #334155;
+      line-height: 1.6;
+    }
+
+    /* Background decoration */
+    .bg-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(79,70,229,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Navigation */
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #4f46e5;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .brand-logo::before {
+      content: "⚡";
+      margin-right: 0.5rem;
+      color: #fbbf24;
+      font-size: 1em;
+      display: inline-block;
+    }
+
+    .brand-logo:hover {
+      color: #3730a3;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-group {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: #64748b;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      border: none;
+      background: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover {
+      color: #4f46e5;
+      background: rgba(79, 70, 229, 0.1);
+    }
+
+    .nav-link.active {
+      color: #4f46e5;
+      background: rgba(79, 70, 229, 0.15);
+      font-weight: 600;
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569 !important;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    /* Main Content */
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 4rem;
+      position: relative;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: -0.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      border-radius: 2px;
+    }
+
+    .page-subtitle {
+      font-size: 1.2rem;
+      color: #64748b;
+      font-weight: 400;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* Form Layout */
+    .form-section {
+      margin-bottom: 3rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-title::before {
+      content: "➕";
+      font-size: 1.2rem;
+    }
+
+    .add-form {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 200px 150px;
+      gap: 2rem;
+      align-items: end;
+      transition: all 0.3s ease;
+    }
+
+    .add-form:hover {
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-input {
+      padding: 1rem 1.25rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: #ffffff;
+      color: #1e293b;
+      transition: all 0.3s ease;
+      outline: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .form-input:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1), 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .file-input {
+      padding: 1rem 1.25rem;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: #f8fafc;
+      color: #475569;
+      transition: all 0.3s ease;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .file-input:hover {
+      border-color: #4f46e5;
+      background: rgba(79, 70, 229, 0.05);
+      transform: translateY(-1px);
+    }
+
+    .file-input:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+
+    .add-btn {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3);
+      height: fit-content;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .add-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .add-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+    }
+
+    .add-btn:hover::before {
+      left: 100%;
+    }
+
+    .add-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .add-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Search Section */
+    .search-section {
+      margin-bottom: 3rem;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      max-width: 600px;
+      padding: 1.25rem 1.5rem 1.25rem 3.5rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-family: inherit;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      color: #1e293b;
+      transition: all 0.3s ease;
+      outline: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-input:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1), 0 8px 25px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .search-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .search-container::before {
+      content: "🔍";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-280px, -50%);
+      font-size: 1.2rem;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Table Layout */
+    .table-section {
+      margin-bottom: 3rem;
+    }
+
+    .table-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .table-container:hover {
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+
+    .bags-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .bags-table thead {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    }
+
+    .bags-table th {
+      padding: 1.5rem 1.25rem;
+      text-align: left;
+      font-weight: 600;
+      color: white;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      position: relative;
+    }
+
+    .bags-table th:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 20%;
+      height: 60%;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .bags-table td {
+      padding: 1.5rem 1.25rem;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.95rem;
+      color: #374151;
+      vertical-align: middle;
+    }
+
+    .bags-table tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    .bags-table tbody tr:hover {
+      background: rgba(79, 70, 229, 0.05);
+      transform: scale(1.01);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .bags-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Enhanced Image Display */
+    .software-image {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 16px;
+      border: 3px solid #e2e8f0;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    .software-image:hover {
+      transform: scale(1.15);
+      border-color: #4f46e5;
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+      z-index: 10;
+      position: relative;
+    }
+
+    .no-image {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      border: 3px dashed #cbd5e1;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: #94a3b8;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .no-image:hover {
+      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+      transform: scale(1.1);
+      border-color: #4f46e5;
+    }
+
+    /* Image Modal for Better Viewing */
+    .image-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(12px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .image-modal.active {
+      display: flex;
+    }
+
+    .modal-image {
+      max-width: 95%;
+      max-height: 95%;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      animation: zoomIn 0.4s ease;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Action buttons in table */
+    .action-buttons {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .bags-table button {
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      min-width: 80px;
+    }
+
+    .bags-table button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.4s;
+    }
+
+    .bags-table button:hover::before {
+      left: 100%;
+    }
+
+    .bags-table .edit-btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .bags-table .edit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    .bags-table .delete-btn {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .bags-table .delete-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    }
+
+    .bags-table button:active {
+      transform: translateY(0);
+    }
+
+    .bags-table button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Software ID Badge */
+    .id-badge {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: inline-block;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    /* Message Display */
+    .message-display {
+      background: rgba(248, 250, 252, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 2rem;
+      font-family: 'Inter', monospace;
+      font-size: 0.9rem;
+      color: #475569;
+      white-space: pre-wrap;
+      word-break: break-word;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-top: 2rem;
+    }
+
+    .message-display:not(:empty) {
+      display: block;
+    }
+
+    .message-display.error {
+      background: rgba(254, 242, 242, 0.95);
+      border-color: #fca5a5;
+      color: #dc2626;
+    }
+
+    .message-display.success {
+      background: rgba(240, 253, 244, 0.95);
+      border-color: #86efac;
+      color: #059669;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #64748b;
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.6;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #374151;
+      font-weight: 600;
+    }
+
+    .empty-state p {
+      font-size: 1.1rem;
+      max-width: 400px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Loading State */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #f3f4f6;
+      border-radius: 50%;
+      border-top-color: #4f46e5;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 0.5rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .add-form {
+        grid-template-columns: 1fr 1fr 200px 150px;
+        gap: 1.5rem;
+      }
+      
+      .software-image,
+      .no-image {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-container {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+      }
+
+      .main-content {
+        padding: 2rem 1rem;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .add-form {
+        grid-template-columns: 1fr;
+        padding: 2rem;
+        gap: 1.5rem;
+      }
+
+      .table-container {
+        overflow-x: auto;
+      }
+
+      .bags-table {
+        min-width: 900px;
+      }
+
+      .bags-table th,
+      .bags-table td {
+        padding: 1rem 0.75rem;
+        font-size: 0.85rem;
+      }
+
+      .software-image,
+      .no-image {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+      }
+
+      .search-container::before {
+        transform: translate(-250px, -50%);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-group {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .main-content {
+        padding: 1.5rem 0.75rem;
+      }
+
+      .page-title {
+        font-size: 1.75rem;
+      }
+
+      .software-image,
+      .no-image {
+        width: 70px;
+        height: 70px;
+        font-size: 1.8rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .form-section,
+    .search-section,
+    .table-section {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .search-section {
+      animation-delay: 0.1s;
+    }
+
+    .table-section {
+      animation-delay: 0.2s;
+    }
+
+    /* Hover effects */
+    .form-group:hover .form-label {
+      color: #4f46e5;
+      transform: translateX(4px);
+    }
+
+    /* No Actions Style */
+    .no-actions {
+      color: #94a3b8;
+      font-style: italic;
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 0.5rem;
+    }
+
+    /* Smart Alert Modal Styles */
+    .smart-alert-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      padding: 1rem;
+    }
+
+    .smart-alert-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .smart-alert {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 24px;
+      padding: 3rem;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+      transform: scale(0.95) translateY(20px);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .smart-alert-overlay.active .smart-alert {
+      transform: scale(1) translateY(0);
+    }
+
+    .smart-alert-icon {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 1.5rem;
+      background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      animation: pulse 2s infinite;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .smart-alert-icon.warning {
+      background: linear-gradient(135deg, #fee2e2 0%, #ef4444 100%);
+    }
+
+    .smart-alert-icon.success {
+      background: linear-gradient(135deg, #dcfce7 0%, #10b981 100%);
+    }
+
+    .smart-alert-icon.edit {
+      background: linear-gradient(135deg, #e0f2fe 0%, #0284c7 100%);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    .smart-alert-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 1rem;
+    }
+
+    .smart-alert-message {
+      font-size: 1.1rem;
+      color: #64748b;
+      margin-bottom: 0.75rem;
+      line-height: 1.5;
+    }
+
+    .smart-alert-details {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      margin-bottom: 2.5rem;
+      font-style: italic;
+      line-height: 1.4;
+    }
+
+    .smart-alert-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .smart-alert-btn {
+      padding: 1rem 2.5rem;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 130px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .smart-alert-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.4s;
+    }
+
+    .smart-alert-btn:hover::before {
+      left: 100%;
+    }
+
+    .smart-alert-btn.primary {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+    }
+
+    .smart-alert-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .smart-alert-btn.edit-primary {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: white;
+      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3);
+    }
+
+    .smart-alert-btn.edit-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4);
+    }
+
+    .smart-alert-btn.secondary {
+      background: #f1f5f9;
+      color: #475569;
+      border: 2px solid #e2e8f0;
+    }
+
+    .smart-alert-btn.secondary:hover {
+      background: #e2e8f0;
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+    }
+
+    .smart-alert-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  
+  <!-- Enhanced Image Modal for Better Viewing -->
+  <div id="imageModal" class="image-modal">
+    <div class="modal-close" onclick="hideImageModal()">✕</div>
+    <img id="modalImage" class="modal-image" src="" alt="Software Image">
+  </div>
+
+  <!-- Enhanced Smart Alert Modal -->
+  <div id="smartAlertOverlay" class="smart-alert-overlay">
+    <div class="smart-alert">
+      <div id="smartAlertIcon" class="smart-alert-icon warning">⚠️</div>
+      <h2 id="smartAlertTitle" class="smart-alert-title">Confirm Action</h2>
+      <p id="smartAlertMessage" class="smart-alert-message">Are you sure you want to proceed?</p>
+      <p id="smartAlertDetails" class="smart-alert-details">Please confirm your action.</p>
+      <div class="smart-alert-actions">
+        <button id="smartAlertCancel" class="smart-alert-btn secondary">Cancel</button>
+        <button id="smartAlertConfirm" class="smart-alert-btn primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+  
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <a href="index.html" class="brand-logo">SoftManage</a>
+      </div>
+      
+      <div class="nav-links">
+        <div class="guest-only nav-group">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="register.html" class="nav-link">Register</a>
+          <a href="login.html" class="nav-link">Login</a>
+        </div>
+
+        <div class="auth-only nav-group">
+          <a href="software.html" class="nav-link active">Software</a>
+          <a href="profile.html" class="nav-link">Profile</a>
+          <button class="nav-link btn-secondary" id="btnLogout">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Software Collection</h1>
+      <p class="page-subtitle">Manage your organization's software assets with precision and style</p>
+    </div>
+    
+    <div class="form-section">
+      <h2 class="section-title">Add New Software</h2>
+      <form id="addForm" class="add-form" enctype="multipart/form-data">
+        <div class="form-group">
+          <label class="form-label">🏢 Vendor</label>
+          <input name="vendor" class="form-input" placeholder="e.g. Microsoft" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">💾 Software Name</label>
+          <input name="name" class="form-input" placeholder="e.g. Office 365" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">📋 Plan Type</label>
+          <input name="plan_type" class="form-input" placeholder="e.g. Business Premium" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">🖼️ Software Image</label>
+          <input type="file" name="image" class="file-input" accept="image/*">
+        </div>
+        
+        <button type="submit" class="add-btn">
+          <span class="btn-text">Add Software</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="search-section">
+      <div class="search-container">
+        <input id="search" class="search-input" placeholder="Search vendor, name, or plan type..." />
+      </div>
+    </div>
+
+    <div class="table-section">
+      <div class="table-container">
+        <table id="tbl" class="bags-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Vendor</th>
+              <th>Software Name</th>
+              <th>Plan Type</th>
+              <th>Preview</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <pre id="softwareMsg" class="message-display"></pre>
+  </main>
+
+  <!-- Include Axios -->
+  
+  <script>
+    // Image Modal functionality
+    function showImageModal(imageSrc, altText) {
+      const modal = document.getElementById('imageModal');
+      const modalImage = document.getElementById('modalImage');
+      
+      modalImage.src = imageSrc;
+      modalImage.alt = altText || 'Software Image';
+      modal.classList.add('active');
+      
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function hideImageModal() {
+      const modal = document.getElementById('imageModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    // Close modal when clicking outside image or pressing Escape
+    document.getElementById('imageModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        hideImageModal();
+      }
+    });
+    
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && document.getElementById('imageModal').classList.contains('active')) {
+        hideImageModal();
+      }
+    });
+
+    // Enhanced renderRow function that integrates with the backend
+    function renderRow(row, isAuthenticated = false) {
+      // Handle software image path - backend returns /uploads/... or uploads/...
+      let imagePath = row.image_path || '/uploads/software.png';
+      // If it doesn't start with http or /, add / prefix
+      if (!imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+        imagePath = '/' + imagePath;
+      }
+      // If it starts with uploads/, add / prefix
+      if (imagePath.startsWith('uploads/')) {
+        imagePath = '/' + imagePath;
+      }
+      
+      const imgUrl = new URL(imagePath.replace(/^\//, ''), getBase()).toString();
+      const fallbackUrl = new URL('uploads/software.png', getBase()).toString();
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><span class="id-badge">#${row.id}</span></td>
+        <td>${escapeHtml(row.vendor)}</td>
+        <td>${escapeHtml(row.name)}</td>
+        <td>${escapeHtml(row.plan_type)}</td>
+        <td>
+          <img src="${imgUrl}" alt="${escapeHtml(row.vendor)} ${escapeHtml(row.name)}"
+               class="software-image"
+               onclick="showImageModal('${imgUrl}', '${escapeHtml(row.vendor)} ${escapeHtml(row.name)}')"
+               onerror="this.onerror=null; this.src='${fallbackUrl}'">
+        </td>
+        <td>
+          ${isAuthenticated ? `
+          <div class="action-buttons">
+            <button class="edit-btn" data-action="edit" data-id="${row.id}">Edit</button>
+            <button class="delete-btn" data-action="delete" data-id="${row.id}" data-name="${escapeHtml(row.vendor)} ${escapeHtml(row.name)}">Delete</button>
+          </div>
+          ` : '<span class="no-actions">Login to manage</span>'}
+        </td>
+      `;
+      tblBody.appendChild(tr);
+    }
+
+    // Utility function to escape HTML
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Show alert for no image
+    function showNoImageAlert() {
+      showMessage('No image available for this software.', 'info');
+    }
+
+    // Enhanced message display function
+    function showMessage(text, type = 'info') {
+      const msg = document.getElementById('softwareMsg');
+      if (!msg) return;
+      
+      msg.textContent = text;
+      msg.className = 'message-display';
+      
+      if (type === 'error') {
+        msg.classList.add('error');
+      } else if (type === 'success') {
+        msg.classList.add('success');
+      }
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        msg.textContent = '';
+        msg.className = 'message-display';
+      }, 5000);
+    }
+
+    // Enhanced delete confirmation using smart alert modal
+    async function confirmDelete(id, name) {
+      try {
+        const confirmed = await showSmartAlert(
+          'Delete Software',
+          `Are you sure you want to delete "${name}"?`,
+          'This action cannot be undone and will permanently remove the software from your collection.',
+          'warning',
+          'Delete',
+          'Cancel'
+        );
+        return confirmed;
+      } catch (error) {
+        console.error('Smart alert modal not available:', error);
+        // Fallback to browser confirm if smart alert fails
+        return confirm(`Are you sure you want to delete "${name}"?\n\nThis action cannot be undone.`);
+      }
+    }
+
+    // Enhanced form submission with loading state
+    function setFormLoading(isLoading) {
+      const btn = document.querySelector('.add-btn');
+      const btnText = btn.querySelector('.btn-text');
+      
+      if (isLoading) {
+        btn.disabled = true;
+        btnText.innerHTML = 'Adding... <span class="loading-spinner"></span>';
+      } else {
+        btn.disabled = false;
+        btnText.textContent = 'Add Software';
+      }
+    }
+
+    // Enhanced table button handling with loading states
+    function setButtonLoading(button, isLoading, originalText) {
+      if (isLoading) {
+        button.disabled = true;
+        button.innerHTML = `${originalText}... <span class="loading-spinner"></span>`;
+      } else {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    }
+
+    // Wait for DOM to be ready and check authentication
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Check authentication first (don't redirect if not authenticated)
+      let isAuthenticated = false;
+      try {
+        if (getToken()) {
+          await api('/users/me'); // verify token with server
+          isAuthenticated = true;
+        }
+      } catch {
+        clearToken();
+      }
+      setAuthUI(isAuthenticated);
+
+      // Hide add form and edit/delete buttons if not authenticated
+      if (!isAuthenticated) {
+        const addForm = document.getElementById('addForm');
+        if (addForm) addForm.style.display = 'none';
+        // Edit and delete buttons will be hidden in renderRow
+      }
+
+      // Override the form submission to use proper loading states and error handling
+      if (addForm) {
+        addForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          setFormLoading(true);
+
+          const fd = new FormData(addForm);
+          console.log('Form data being sent:');
+          for (let [key, value] of fd.entries()) {
+            console.log(key, value);
+          }
+
+          try {
+            console.log('Sending POST request to /software');
+            const response = await api('/software', { method: 'POST', data: fd, multipart: true });
+            console.log('API response:', response);
+            showMessage('Software added successfully!', 'success');
+            addForm.reset();
+            await loadSoftware(search?.value || '', isAuthenticated);
+      } catch (err) {
+        console.error('API error:', err);
+        let errorMsg = err.message || 'Failed to add software. Please try again.';
+        if (errorMsg === 'Duplicate software entry detected.') {
+          errorMsg = 'This software already exists. Please check your entries.';
+        }
+        showMessage(errorMsg, 'error');
+      } finally {
+            setFormLoading(false);
+          }
+        });
+      }
+
+      // Override the table button handling
+      if (tblBody) {
+        tblBody.addEventListener('click', async (e) => {
+          const btn = e.target.closest('button');
+          if (!btn) return;
+
+          const id = btn.dataset.id;
+          const action = btn.dataset.action;
+
+          if (action === 'edit') {
+            location.href = `edit.html?id=${encodeURIComponent(id)}`;
+            return;
+          }
+
+          if (action === 'delete') {
+            const name = btn.dataset.name;
+            const confirmed = await confirmDelete(id, name);
+
+            if (!confirmed) return;
+
+            const originalText = btn.textContent;
+            setButtonLoading(btn, true, 'Delete');
+
+            try {
+              await api('/software/' + id, { method: 'DELETE' });
+              showMessage(`"${name}" deleted successfully!`, 'success');
+              await loadSoftware(search?.value || '', isAuthenticated);
+            } catch (err) {
+              const errorMsg = err.message || 'Failed to delete software. Please try again.';
+              showMessage(errorMsg, 'error');
+              setButtonLoading(btn, false, originalText);
+            }
+          }
+        });
+      }
+
+      // Enhanced search with debouncing
+      if (search) {
+        let searchTimeout;
+        search.addEventListener('input', () => {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => {
+            loadSoftware(search.value, isAuthenticated);
+          }, 300); // 300ms debounce
+        });
+      }
+
+      // Initial load
+      await loadSoftware('', isAuthenticated);
+    });
+
+    // Enhanced loadSoftware function with better error handling
+    async function loadSoftware(q = '', isAuthenticated = false) {
+      try {
+        const rows = await api('/software' + (q ? `?q=${encodeURIComponent(q)}` : ''));
+
+        if (tblBody) {
+          tblBody.innerHTML = '';
+
+          if (rows.length === 0) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = `
+              <td colspan="6" class="empty-state">
+                <div class="empty-state-icon">📦</div>
+                <h3>No Software Found</h3>
+                <p>${q ? `No software matches "${q}". Try a different search term.` : 'Start by adding your first software above.'}</p>
+              </td>
+            `;
+            tblBody.appendChild(emptyRow);
+          } else {
+            rows.forEach(row => renderRow(row, isAuthenticated));
+          }
+        }
+      } catch (e) {
+        console.error('Error loading software:', e);
+        showMessage('Failed to load software. Please check your connection and try again.', 'error');
+
+        // Show empty state with error
+        if (tblBody) {
+          tblBody.innerHTML = `
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-state-icon">⚠️</div>
+                <h3>Connection Error</h3>
+                <p>Unable to load software. Please refresh the page or try again later.</p>
+              </td>
+            </tr>
+          `;
+        }
+      }
+    }
+
+    // File input preview functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const fileInput = document.querySelector('input[name="image"]');
+      if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            // Show file name feedback
+            const label = this.previousElementSibling;
+            if (label) {
+              label.textContent = `🖼️ Selected: ${file.name}`;
+              setTimeout(() => {
+                label.textContent = '🖼️ Software Image';
+              }, 3000);
+            }
+          }
+        });
+      }
+    });
+  </script>
+  
+  <!-- Include Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="app-axios.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - No Refresh Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug-info { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <h1>Debug Page - No Auto-Refresh</h1>
+    <p>This page should NOT refresh automatically. If it does, there's a JavaScript issue.</p>
+    
+    <div id="debug-info" class="debug-info">
+        <h3>Debug Information:</h3>
+        <p>Page loaded at: <span id="load-time"></span></p>
+        <p>Backend status: <span id="backend-status">Checking...</span></p>
+        <p>Console errors: <span id="console-errors">None detected</span></p>
+    </div>
+
+    <div id="test-results"></div>
+
+    <script>
+        // Set load time
+        document.getElementById('load-time').textContent = new Date().toLocaleString();
+        
+        // Track console errors
+        let errorCount = 0;
+        const originalError = console.error;
+        console.error = function(...args) {
+            errorCount++;
+            document.getElementById('console-errors').textContent = `${errorCount} error(s) detected`;
+            originalError.apply(console, args);
+        };
+
+        // Test backend connection
+        async function testBackend() {
+            const statusEl = document.getElementById('backend-status');
+            const resultsEl = document.getElementById('test-results');
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/test');
+                if (response.ok) {
+                    statusEl.textContent = 'Connected ✅';
+                    statusEl.className = 'success';
+                    resultsEl.innerHTML = '<div class="success">Backend is running and accessible!</div>';
+                } else {
+                    statusEl.textContent = 'Error ❌';
+                    statusEl.className = 'error';
+                    resultsEl.innerHTML = '<div class="error">Backend responded with error: ' + response.status + '</div>';
+                }
+            } catch (error) {
+                statusEl.textContent = 'Not accessible ❌';
+                statusEl.className = 'error';
+                resultsEl.innerHTML = '<div class="error">Cannot connect to backend: ' + error.message + '</div>';
+            }
+        }
+
+        // Run test after a short delay
+        setTimeout(testBackend, 1000);
+        
+        // Prevent any accidental refreshes
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = 'Are you sure you want to leave?';
+        });
+    </script>
+</body>
+</html>
